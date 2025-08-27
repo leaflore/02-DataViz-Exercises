@@ -5,8 +5,33 @@
     </head>
     <body>
         <script>
-            const url = 'https://gist.githubusercontent.com/leaflore/ae12e6178a767dc2d02f7a81ccd5cd4e/raw/BK-cssNamedColors.csv';
-            console.log(fetch(url));
+            //This is the formal way to create the promise function?
+            //const promise = fetch(url);
+            //promise.then(respone => {})
+
+            //This is short way of fetching a url and displaying the text.
+            //This method creates the "Pyramid of Doom"
+            // fetch(url).then(response => {
+            //     response.text().then(text => {
+            //         console.log(text);
+            //     });
+                
+            // });
+
+            //Using Async and await to escape the "Pyramid of Doom"
+            const fetchText = async (url) => {
+                    const response = await fetch(url);
+                    return await response.text();
+                    
+            };
+
+            const csvUrl = 'https://gist.githubusercontent.com/leaflore/ae12e6178a767dc2d02f7a81ccd5cd4e/raw/BK-cssNamedColors.csv';
+
+            fetchText(csvUrl).then(text => {
+                console.log(text);
+            });
+            
+
         </script>
     </body>
 </html>
