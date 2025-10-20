@@ -1,53 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Hello HTML</title>
-        <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-        <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-        <script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"></script>
+        <title>Rendering Data with React & D3</title>
         <style>
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
             pre {
                 font-size: 7em;
             }
         </style>
+        <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+        <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+        <script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"></script>
     </head>
     <body>
-        <pre id="message container"></pre>
-        <script>
-            //This is the formal way to create the promise function?
-            //const promise = fetch(url);
-            //promise.then(respone => {})
-
-            //This is short way of fetching a url and displaying the text.
-            //This method creates the "Pyramid of Doom"
-            // fetch(url).then(response => {
-            //     response.text().then(text => {
-            //         console.log(text);
-            //     });
-                
-            // });
-
-            //Using Async and await to escape the "Pyramid of Doom"
-            
-
-            const csvUrl = 'https://gist.githubusercontent.com/leaflore/ae12e6178a767dc2d02f7a81ccd5cd4e/raw/BK-cssNamedColors.csv';
-            d3.csv(csvUrl).then(data => {
-                let message = '';
-                message = message + Math.round(d3.csvFormat(data).length / 10124) + 'kB\n';
-                message = message + data.length + 'rows\n';
-                message = message + data.columns.length + 'columns';
-                document.getElementById('message container').textContent = message;
-            });
-
-            const fetchText = async (url) => {
-                    const response = await fetch(url);
-                    return await response.text();
-                    
-            };
-            
-            //Before is what you would do fetch, async, and await.
-            
-
-        </script>
+        <div id="root"></div>
+        <script src="./project-folder/bundle.js"></script>
     </body>
 </html>
