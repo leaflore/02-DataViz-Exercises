@@ -12,17 +12,19 @@ export default {
     // }
     // console.error(message);
     // },
-    input:'./main.js',
+    input:'./src/index.js',
     output: {
       file:'build/bundle.js',
       format:'iife',
       name: 'MyReactApp',
       globals: {
         'd3': 'd3',
+        'react' : 'React',
+        'react-dom': 'ReactDOM'
       }
     },
     external: [
-      'd3',
+      'd3', 'react', 'react-dom',
     ],
     plugins: [
       resolve(),
