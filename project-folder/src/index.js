@@ -20,9 +20,15 @@ const App = () => {
     if (!data) {
         return <pre>Loading...</pre>
     }
-
+    return (
+        <svg width={width} height={height}>
+            {data.map(d => (
+                <path fill = {d['RGB hex value']} />
+            ))}
+        </svg>
+    );
     //d[] is another way accessing a property when you can not use the "." notation.
-    return data.map(d => <div style={{backgroundColor: d['RGB hex value'], width: '960px', height: '4px'}}></div>);
+    
 };
 
 const rootElement = document.getElementById('root');
