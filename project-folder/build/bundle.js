@@ -47,7 +47,7 @@
     }
   }
 
-  var csvUrl = 'https://gist.githubusercontent.com/leaflore/ae12e6178a767dc2d02f7a81ccd5cd4e/raw/BK-cssNamedColors.csv';
+  var csvUrl = 'https://gist.githubusercontent.com/leaflore/ae12e6178a767dc2d02f7a81ccd5cd4e/raw/e60193f4973fa9e6ab6e69cc53b16a9c41e36f6f/BK-cssNamedColors.csv';
   var App = function App() {
     var _useState = React.useState(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -63,7 +63,9 @@
     return data.map(function (d) {
       return /*#__PURE__*/React.createElement("div", {
         style: {
-          backgroundColor: d.color
+          backgroundColor: d['RGB hex value'],
+          width: '960px',
+          height: '4px'
         }
       });
     });

@@ -1,3 +1,1 @@
-A program that loads and parses some CSV data.
-
-Adding some data to test uploading to Github.
+A program that loads and parses some CSV [data about CSS named colors](https://gist.github.com/leaflore/ae12e6178a767dc2d02f7a81ccd5cd4e#file-bk-cssnamedcolors-csv) using D3 utitlities, and uses React to render the data.
