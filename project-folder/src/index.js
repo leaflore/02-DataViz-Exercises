@@ -23,7 +23,7 @@ const App = () => {
     return (
         <svg width={width} height={height}>
             {data.map(d => (
-                <path fill = {d['RGB hex value']} />
+                <path fill = {d['RGB hex value']} d={pieArc()} />
             ))}
         </svg>
     );
