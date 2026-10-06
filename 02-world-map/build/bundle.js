@@ -50,6 +50,8 @@
   // jsonUrl variable
   var jsonUrl = 'https://unpkg.com/world-atlas@2.0.2/countries-50m.json';
   var useData = function useData() {
+    //State to hold the GeoJSON data. Initially set to null.
+    // This is a form array destructuring assignment used to extract the state and the updater function.
     var _useState = React$1.useState(null),
       _useState2 = _slicedToArray(_useState, 2),
       data = _useState2[0],
@@ -57,139 +59,78 @@
 
     // World Atlas JSON data
     // Logs data to the console
-    //console.log(data);
-    console.log(topojson.feature);
+    // console.log(data);
+    // console.log(feature); Was used to look at features (was not abble to get it to work)
+
     React$1.useEffect(function () {
-      d3.json(jsonUrl).then(setData);
+      d3.json(jsonUrl).then(function (topojsonData) {
+        console.log(topojsonData);
+        setData(topojson.feature(topojsonData));
+      });
     }, []);
     return data;
   };
 
-  var AxisBottom = function AxisBottom(_ref) {
-    var xScale = _ref.xScale,
-      innerHeight = _ref.innerHeight,
-      tickFormat = _ref.tickFormat,
-      _ref$tickOffset = _ref.tickOffset,
-      tickOffset = _ref$tickOffset === void 0 ? 3 : _ref$tickOffset;
-    return xScale.ticks().map(function (tickValue) {
-      return /*#__PURE__*/React.createElement("g", {
-        className: "tick",
-        key: tickValue,
-        transform: "translate(".concat(xScale(tickValue), ",0)")
-      }, /*#__PURE__*/React.createElement("line", {
-        y2: innerHeight
-      }), /*#__PURE__*/React.createElement("text", {
-        style: {
-          textAnchor: 'middle'
-        },
-        dy: ".71em",
-        y: innerHeight + tickOffset
-      }, tickFormat(tickValue)));
-    });
-  };
+  /*export const useData = () => {
+    const [data, setData] = useState(null);
 
-  var AxisLeft = function AxisLeft(_ref) {
-    var yScale = _ref.yScale,
-      innerWidth = _ref.innerWidth,
-      _ref$tickOffset = _ref.tickOffset,
-      tickOffset = _ref$tickOffset === void 0 ? 3 : _ref$tickOffset;
-    return yScale.ticks().map(function (tickValue) {
-      return /*#__PURE__*/React.createElement("g", {
-        className: "tick",
-        transform: "translate(0,".concat(yScale(tickValue), ")")
-      }, /*#__PURE__*/React.createElement("line", {
-        x2: innerWidth
-      }), /*#__PURE__*/React.createElement("text", {
-        key: tickValue,
-        style: {
-          textAnchor: 'end'
-        },
-        x: -tickOffset,
-        dy: ".32em"
-      }, tickValue));
-    });
-  };
+    useEffect(() => {
+      json(jsonUrl).then(topology => {
+        const { countries, land } = topology.objects;
+        setData({
+          land: feature(topology, land),
+          countries: feature(topology, countries)
+        });
+      });
+    }, []);
 
+    return data;
+  }; */
+
+  var projection = d3.geoNaturalEarth1();
+  var path = d3.geoPath(projection);
+  var graticule = d3.geoGraticule();
   var Marks = function Marks(_ref) {
-    var data = _ref.data,
-      xScale = _ref.xScale,
-      yScale = _ref.yScale,
-      xValue = _ref.xValue,
-      yValue = _ref.yValue;
-      _ref.tooltipFormat;
-      _ref.circleRadius;
+    var _ref$data = _ref.data;
+      _ref$data.land;
+      var countries = _ref$data.countries;
     return /*#__PURE__*/React.createElement("g", {
       className: "marks"
     }, /*#__PURE__*/React.createElement("path", {
+      className: "sphere",
+      d: path({
+        type: 'Sphere'
+      }),
+      fill: "#e8f4fa"
+    }), /*#__PURE__*/React.createElement("path", {
+      className: "graticule",
+      d: path(graticule()),
       fill: "none",
-      stroke: "black",
-      d: d3.line().x(function (d) {
-        return xScale(xValue(d));
-      }).y(function (d) {
-        return yScale(yValue(d));
-      }).curve(d3.curveNatural)(data)
+      stroke: "#ccc"
+    }), countries.features.map(function (feature) {
+      return /*#__PURE__*/React.createElement("path", {
+        key: feature.id,
+        d: path(feature),
+        fill: "#ddd",
+        stroke: "#999",
+        strokeWidth: 0.3
+      }, /*#__PURE__*/React.createElement("title", null, feature.properties.name));
     }));
   };
 
   var width = 960;
   var height = 500;
-  var margin = {
-    top: 20,
-    right: 30,
-    bottom: 65,
-    left: 90
-  };
-  var xAxisLabelOffset = 50;
   var App = function App() {
     var data = useData();
     if (!data) {
       return /*#__PURE__*/React$1.createElement("pre", null, "Loading...");
     }
-    var innerHeight = height - margin.top - margin.bottom;
-    var innerWidth = width - margin.left - margin.right;
-    var xValue = function xValue(d) {
-      return d.timestamp;
-    };
-    var xAxisLabel = 'Time';
-    var yValue = function yValue(d) {
-      return d.temperature;
-    };
-    var yAxisLabel = 'Temperature';
-    var xAxisTickFormat = d3.timeFormat('%a');
-    var xScale = d3.scaleTime().domain(d3.extent(data, xValue)).range([0, innerWidth]).nice();
-    var yScale = d3.scaleLinear().domain(d3.extent(data, yValue)).range([innerHeight, 0]).nice();
     return /*#__PURE__*/React$1.createElement("svg", {
       width: width,
       height: height
-    }, /*#__PURE__*/React$1.createElement("g", {
-      transform: "translate(".concat(margin.left, ",").concat(margin.top, ")")
-    }, /*#__PURE__*/React$1.createElement(AxisBottom, {
-      xScale: xScale,
-      innerHeight: innerHeight,
-      tickFormat: xAxisTickFormat,
-      tickOffset: 7
-    }), /*#__PURE__*/React$1.createElement("text", {
-      className: "axis-label",
-      textAnchor: "middle",
-      transform: "translate(".concat(-45, ",").concat(innerHeight / 2, ") rotate(-90)")
-    }, yAxisLabel), /*#__PURE__*/React$1.createElement(AxisLeft, {
-      yScale: yScale,
-      innerWidth: innerWidth,
-      tickOffset: 7
-    }), /*#__PURE__*/React$1.createElement("text", {
-      className: "axis-label",
-      x: innerWidth / 2,
-      y: innerHeight + xAxisLabelOffset,
-      textAnchor: "middle"
-    }, xAxisLabel), /*#__PURE__*/React$1.createElement(Marks, {
-      data: data,
-      xScale: xScale,
-      yScale: yScale,
-      xValue: xValue,
-      yValue: yValue,
-      tooltipFormat: xAxisTickFormat,
-      circleRadius: 3
-    })));
+    }, /*#__PURE__*/React$1.createElement(Marks, {
+      data: data
+    }));
   };
   var rootElement = document.getElementById('root');
   ReactDOM.render(/*#__PURE__*/React$1.createElement(App, null), rootElement);
