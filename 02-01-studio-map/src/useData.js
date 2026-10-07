@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { json } from 'd3';
-import { feature } from 'topojson';
 
-// jsonUrl variable
-const jsonUrl = 'https://unpkg.com/world-atlas@2.0.2/countries-50m.json';
+// LA GeoHub Neighborhood Councils layer, filtered server-side to two NCs, returned as GeoJSON in WGS84
+const where = "NAME IN ('HOLLYWOOD HILLS WEST NC', 'BEL AIR-BEVERLY CREST NC')";
+const jsonUrl =
+  "https://maps.lacity.org/lahub/rest/services/Boundaries/MapServer/18/query" +
+  `?outFields=*&where=${encodeURIComponent(where)}&outSR=4326&f=geojson`;
 
 export const useData = () => {
 
   //State to hold the GeoJSON data. Initially set to null.
   // This is a form array destructuring assignment used to extract the state and the updater function.
   const [data, setData] = useState(null);
-  console.log(data);
 
 
   // World Atlas JSON data
@@ -19,10 +20,15 @@ export const useData = () => {
   // console.log(feature); Was used to look at features (was not abble to get it to work)
   
   useEffect(() => {
-    json(jsonUrl).then(topojsonData => {
-      // console.log(topojsonData); // way to inspect the data before converting it to GeoJSON
-      const { countries } = topojsonData.objects;
-      setData(feature(topojsonData, countries));
+    json(jsonUrl).then(fc => {
+      // ArcGIS returns counter-clockwise exterior rings (RFC 7946); d3 expects clockwise,
+      // otherwise it treats each polygon as "the whole globe minus the polygon".
+      fc.features.forEach(f => {
+        f.geometry.coordinates = f.geometry.type === 'Polygon'
+          ? f.geometry.coordinates.map(ring => ring.slice().reverse())
+          : f.geometry.coordinates.map(poly => poly.map(ring => ring.slice().reverse()));
+      });
+      setData(fc);
     });
   }, []);
   

@@ -1,4 +1,4 @@
-(function (React$1, ReactDOM, d3, topojson) {
+(function (React$1, ReactDOM, d3) {
   'use strict';
 
   function _arrayLikeToArray(r, a) {
@@ -47,8 +47,9 @@
     }
   }
 
-  // jsonUrl variable
-  var jsonUrl = 'https://unpkg.com/world-atlas@2.0.2/countries-50m.json';
+  // LA GeoHub Neighborhood Councils layer, filtered server-side to two NCs, returned as GeoJSON in WGS84
+  var where = "NAME IN ('HOLLYWOOD HILLS WEST NC', 'BEL AIR-BEVERLY CREST NC')";
+  var jsonUrl = "https://maps.lacity.org/lahub/rest/services/Boundaries/MapServer/18/query" + "?outFields=*&where=".concat(encodeURIComponent(where), "&outSR=4326&f=geojson");
   var useData = function useData() {
     //State to hold the GeoJSON data. Initially set to null.
     // This is a form array destructuring assignment used to extract the state and the updater function.
@@ -56,7 +57,6 @@
       _useState2 = _slicedToArray(_useState, 2),
       data = _useState2[0],
       setData = _useState2[1];
-    console.log(data);
 
     // World Atlas JSON data
     // Logs data to the console
@@ -64,10 +64,19 @@
     // console.log(feature); Was used to look at features (was not abble to get it to work)
 
     React$1.useEffect(function () {
-      d3.json(jsonUrl).then(function (topojsonData) {
-        // console.log(topojsonData); // way to inspect the data before converting it to GeoJSON
-        var countries = topojsonData.objects.countries;
-        setData(topojson.feature(topojsonData, countries));
+      d3.json(jsonUrl).then(function (fc) {
+        // ArcGIS returns counter-clockwise exterior rings (RFC 7946); d3 expects clockwise,
+        // otherwise it treats each polygon as "the whole globe minus the polygon".
+        fc.features.forEach(function (f) {
+          f.geometry.coordinates = f.geometry.type === 'Polygon' ? f.geometry.coordinates.map(function (ring) {
+            return ring.slice().reverse();
+          }) : f.geometry.coordinates.map(function (poly) {
+            return poly.map(function (ring) {
+              return ring.slice().reverse();
+            });
+          });
+        });
+        setData(fc);
       });
     }, []);
     return data;
@@ -93,16 +102,14 @@
     var data = _ref.data,
       width = _ref.width,
       height = _ref.height;
-    var projection = d3.geoNaturalEarth1().fitSize([width, height], data);
+    var projection = d3.geoMercator().fitSize([width, height], data);
     var path = d3.geoPath(projection);
     return /*#__PURE__*/React.createElement("g", {
       className: "marks"
-    }, data.features.map(function (country) {
+    }, data.features.map(function (d) {
       return /*#__PURE__*/React.createElement("path", {
-        key: country.id,
-        d: path(country),
-        fill: "lightsteelblue",
-        stroke: "white"
+        key: d.properties.OBJECTID,
+        d: path(d)
       });
     }));
   };
@@ -117,37 +124,13 @@
     return /*#__PURE__*/React$1.createElement("svg", {
       width: width,
       height: height
-    }, /*#__PURE__*/React$1.createElement("g", {
-      transform: "translate(".concat(margin.left, ",").concat(margin.top, ")")
-    }, /*#__PURE__*/React$1.createElement(AxisBottom, {
-      xScale: xScale,
-      innerHeight: innerHeight,
-      tickFormat: xAxisTickFormat,
-      tickOffset: 7
-    }), /*#__PURE__*/React$1.createElement("text", {
-      className: "axis-label",
-      textAnchor: "middle",
-      transform: "translate(".concat(-yAxisLabelOffset, ",").concat(innerHeight / 2, ") rotate(-90)")
-    }, yAxisLabel), /*#__PURE__*/React$1.createElement(AxisLeft, {
-      yScale: yScale,
-      innerWidth: innerWidth,
-      tickOffset: 7
-    }), /*#__PURE__*/React$1.createElement("text", {
-      className: "axis-label",
-      x: innerWidth / 2,
-      y: innerHeight + xAxisLabelOffset,
-      textAnchor: "middle"
-    }, xAxisLabel), /*#__PURE__*/React$1.createElement(Marks, {
+    }, /*#__PURE__*/React$1.createElement(Marks, {
       data: data,
-      xScale: xScale,
-      yScale: yScale,
-      xValue: xValue,
-      yValue: yValue,
-      tooltipFormat: xAxisTickFormat,
-      circleRadius: 3
-    })));
+      width: width,
+      height: height
+    }));
   };
   var rootElement = document.getElementById('root');
   ReactDOM.render(/*#__PURE__*/React$1.createElement(App, null), rootElement);
 
-})(React, ReactDOM, d3, topojson);
+})(React, ReactDOM, d3);

@@ -15,7 +15,7 @@ const App = () => {
 
   return (
     <svg width={width} height={height}>
-        <Marks data={data} /> 
+        <Marks data={data} width={width} height={height} />
         {/* In modern JavaScript  { data } is shorthand for { data: data } */}
     </svg>
   );
