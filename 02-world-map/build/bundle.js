@@ -50,34 +50,71 @@
   // jsonUrl variable
   var jsonUrl = 'https://unpkg.com/world-atlas@2.0.2/countries-50m.json';
   var useData = function useData() {
+    //State to hold the GeoJSON data. Initially set to null.
+    // This is a form array destructuring assignment used to extract the state and the updater function.
     var _useState = React$1.useState(null),
       _useState2 = _slicedToArray(_useState, 2),
       data = _useState2[0],
       setData = _useState2[1];
+
+    // World Atlas JSON data
+    // Logs data to the console
+    // console.log(data);
+    // console.log(feature); Was used to look at features (was not abble to get it to work)
+
     React$1.useEffect(function () {
-      d3.json(jsonUrl).then(function (topjsonData) {
-        console.log(topjsonData);
+      d3.json(jsonUrl).then(function (topojsonData) {
+        console.log(topojsonData);
         setData(topojson.feature(topojsonData));
       });
     }, []);
     return data;
   };
 
+  /*export const useData = () => {
+    const [data, setData] = useState(null);
+
+    useEffect(() => {
+      json(jsonUrl).then(topology => {
+        const { countries, land } = topology.objects;
+        setData({
+          land: feature(topology, land),
+          countries: feature(topology, countries)
+        });
+      });
+    }, []);
+
+    return data;
+  }; */
+
+  var projection = d3.geoNaturalEarth1();
+  var path = d3.geoPath(projection);
+  var graticule = d3.geoGraticule();
   var Marks = function Marks(_ref) {
-    var data = _ref.data,
-      width = _ref.width,
-      height = _ref.height;
-    var projection = d3.geoNaturalEarth1().fitSize([width, height], data);
-    var path = d3.geoPath(projection);
+    var _ref$data = _ref.data;
+      _ref$data.land;
+      var countries = _ref$data.countries;
     return /*#__PURE__*/React.createElement("g", {
       className: "marks"
-    }, data.features.map(function (country) {
+    }, /*#__PURE__*/React.createElement("path", {
+      className: "sphere",
+      d: path({
+        type: 'Sphere'
+      }),
+      fill: "#e8f4fa"
+    }), /*#__PURE__*/React.createElement("path", {
+      className: "graticule",
+      d: path(graticule()),
+      fill: "none",
+      stroke: "#ccc"
+    }), countries.features.map(function (feature) {
       return /*#__PURE__*/React.createElement("path", {
-        key: country.id,
-        d: path(country),
-        fill: "lightsteelblue",
-        stroke: "white"
-      });
+        key: feature.id,
+        d: path(feature),
+        fill: "#ddd",
+        stroke: "#999",
+        strokeWidth: 0.3
+      }, /*#__PURE__*/React.createElement("title", null, feature.properties.name));
     }));
   };
 
@@ -92,9 +129,7 @@
       width: width,
       height: height
     }, /*#__PURE__*/React$1.createElement(Marks, {
-      data: data,
-      width: width,
-      height: height
+      data: data
     }));
   };
   var rootElement = document.getElementById('root');
