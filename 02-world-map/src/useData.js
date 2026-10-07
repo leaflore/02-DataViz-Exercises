@@ -9,14 +9,11 @@ const jsonUrl =
 export const useData = () => {
   const [data, setData] = useState(null);
 
-
-  // World Atlas JSON data
-  // Logs data to the console
-  //console.log(data);
-  console.log(feature);
-  
   useEffect(() => {
-    json(jsonUrl).then(setData);
+    json(jsonUrl).then(topjsonData => {
+      const { countries } = topojsonData.objects
+      setData(feature(topojsonData, countries));
+    });
   }, []);
   
   return data;
