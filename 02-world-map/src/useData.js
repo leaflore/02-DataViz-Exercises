@@ -10,6 +10,7 @@ export const useData = () => {
   //State to hold the GeoJSON data. Initially set to null.
   // This is a form array destructuring assignment used to extract the state and the updater function.
   const [data, setData] = useState(null);
+  console.log(data);
 
 
   // World Atlas JSON data

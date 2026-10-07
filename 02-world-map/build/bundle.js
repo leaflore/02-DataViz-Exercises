@@ -56,6 +56,7 @@
       _useState2 = _slicedToArray(_useState, 2),
       data = _useState2[0],
       setData = _useState2[1];
+    console.log(data);
 
     // World Atlas JSON data
     // Logs data to the console
@@ -64,8 +65,9 @@
 
     React$1.useEffect(function () {
       d3.json(jsonUrl).then(function (topojsonData) {
-        console.log(topojsonData);
-        setData(topojson.feature(topojsonData));
+        // console.log(topojsonData); // way to inspect the data before converting it to GeoJSON
+        var countries = topojsonData.objects.countries;
+        setData(topojson.feature(topojsonData, countries));
       });
     }, []);
     return data;
@@ -87,34 +89,21 @@
     return data;
   }; */
 
-  var projection = d3.geoNaturalEarth1();
-  var path = d3.geoPath(projection);
-  var graticule = d3.geoGraticule();
   var Marks = function Marks(_ref) {
-    var _ref$data = _ref.data;
-      _ref$data.land;
-      var countries = _ref$data.countries;
+    var data = _ref.data,
+      width = _ref.width,
+      height = _ref.height;
+    var projection = d3.geoNaturalEarth1().fitSize([width, height], data);
+    var path = d3.geoPath(projection);
     return /*#__PURE__*/React.createElement("g", {
       className: "marks"
-    }, /*#__PURE__*/React.createElement("path", {
-      className: "sphere",
-      d: path({
-        type: 'Sphere'
-      }),
-      fill: "#e8f4fa"
-    }), /*#__PURE__*/React.createElement("path", {
-      className: "graticule",
-      d: path(graticule()),
-      fill: "none",
-      stroke: "#ccc"
-    }), countries.features.map(function (feature) {
+    }, data.features.map(function (country) {
       return /*#__PURE__*/React.createElement("path", {
-        key: feature.id,
-        d: path(feature),
-        fill: "#ddd",
-        stroke: "#999",
-        strokeWidth: 0.3
-      }, /*#__PURE__*/React.createElement("title", null, feature.properties.name));
+        key: country.id,
+        d: path(country),
+        fill: "lightsteelblue",
+        stroke: "white"
+      });
     }));
   };
 
@@ -128,9 +117,35 @@
     return /*#__PURE__*/React$1.createElement("svg", {
       width: width,
       height: height
-    }, /*#__PURE__*/React$1.createElement(Marks, {
-      data: data
-    }));
+    }, /*#__PURE__*/React$1.createElement("g", {
+      transform: "translate(".concat(margin.left, ",").concat(margin.top, ")")
+    }, /*#__PURE__*/React$1.createElement(AxisBottom, {
+      xScale: xScale,
+      innerHeight: innerHeight,
+      tickFormat: xAxisTickFormat,
+      tickOffset: 7
+    }), /*#__PURE__*/React$1.createElement("text", {
+      className: "axis-label",
+      textAnchor: "middle",
+      transform: "translate(".concat(-yAxisLabelOffset, ",").concat(innerHeight / 2, ") rotate(-90)")
+    }, yAxisLabel), /*#__PURE__*/React$1.createElement(AxisLeft, {
+      yScale: yScale,
+      innerWidth: innerWidth,
+      tickOffset: 7
+    }), /*#__PURE__*/React$1.createElement("text", {
+      className: "axis-label",
+      x: innerWidth / 2,
+      y: innerHeight + xAxisLabelOffset,
+      textAnchor: "middle"
+    }, xAxisLabel), /*#__PURE__*/React$1.createElement(Marks, {
+      data: data,
+      xScale: xScale,
+      yScale: yScale,
+      xValue: xValue,
+      yValue: yValue,
+      tooltipFormat: xAxisTickFormat,
+      circleRadius: 3
+    })));
   };
   var rootElement = document.getElementById('root');
   ReactDOM.render(/*#__PURE__*/React$1.createElement(App, null), rootElement);
