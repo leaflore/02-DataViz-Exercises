@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import { useData } from './useData';
 import { Marks } from './Marks';
 
-const width = 960;
-const height = 500;
+const width = 1250;
+const height = 800;
 
 const App = () => {
   const data = useData();
@@ -15,7 +15,7 @@ const App = () => {
 
   return (
     <svg width={width} height={height}>
-        <Marks data={data} /> 
+        <Marks data={data} width={width} height={height} />
         {/* In modern JavaScript  { data } is shorthand for { data: data } */}
     </svg>
   );

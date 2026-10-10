@@ -93,22 +93,28 @@
     var data = _ref.data,
       width = _ref.width,
       height = _ref.height;
-    var projection = d3.geoNaturalEarth1().fitSize([width, height], data);
+    //This is the parentheses mentioned below.
+    var projection = d3.geoEqualEarth().fitSize([width, height], {
+      type: 'FeatureCollection',
+      features: data.features
+    });
     var path = d3.geoPath(projection);
     return /*#__PURE__*/React.createElement("g", {
       className: "marks"
-    }, data.features.map(function (country) {
+    }, data.features.map(function (feature) {
       return /*#__PURE__*/React.createElement("path", {
-        key: country.id,
-        d: path(country),
-        fill: "lightsteelblue",
-        stroke: "white"
+        d: path(feature)
       });
-    }));
+    })
+    /*
+     Using the parentheses as an implicit return for the arrow function.
+     The parentheses are required so JavaScript knows the curly braces represent an object 
+     literal rather than a function block.
+    */);
   };
 
-  var width = 960;
-  var height = 500;
+  var width = 1250;
+  var height = 800;
   var App = function App() {
     var data = useData();
     if (!data) {
@@ -117,35 +123,11 @@
     return /*#__PURE__*/React$1.createElement("svg", {
       width: width,
       height: height
-    }, /*#__PURE__*/React$1.createElement("g", {
-      transform: "translate(".concat(margin.left, ",").concat(margin.top, ")")
-    }, /*#__PURE__*/React$1.createElement(AxisBottom, {
-      xScale: xScale,
-      innerHeight: innerHeight,
-      tickFormat: xAxisTickFormat,
-      tickOffset: 7
-    }), /*#__PURE__*/React$1.createElement("text", {
-      className: "axis-label",
-      textAnchor: "middle",
-      transform: "translate(".concat(-yAxisLabelOffset, ",").concat(innerHeight / 2, ") rotate(-90)")
-    }, yAxisLabel), /*#__PURE__*/React$1.createElement(AxisLeft, {
-      yScale: yScale,
-      innerWidth: innerWidth,
-      tickOffset: 7
-    }), /*#__PURE__*/React$1.createElement("text", {
-      className: "axis-label",
-      x: innerWidth / 2,
-      y: innerHeight + xAxisLabelOffset,
-      textAnchor: "middle"
-    }, xAxisLabel), /*#__PURE__*/React$1.createElement(Marks, {
+    }, /*#__PURE__*/React$1.createElement(Marks, {
       data: data,
-      xScale: xScale,
-      yScale: yScale,
-      xValue: xValue,
-      yValue: yValue,
-      tooltipFormat: xAxisTickFormat,
-      circleRadius: 3
-    })));
+      width: width,
+      height: height
+    }));
   };
   var rootElement = document.getElementById('root');
   ReactDOM.render(/*#__PURE__*/React$1.createElement(App, null), rootElement);
