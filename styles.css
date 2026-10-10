@@ -16,8 +16,9 @@ pre {
   fill: #137B80;
 }
 .marks path {
+  fill: rgb(214, 212, 212);
   stroke: #137B80;
-  stroke-width: 4;
+  stroke-width: 1;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
